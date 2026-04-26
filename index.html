@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pre-Med & CAA Roadmap</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css">
+  <style>
+    :root {
+      --base-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      --base-font-size: 15px;
+      --base-line-height: 1.7;
+      --theme-color: #2563eb;
+      --sidebar-width: 280px;
+      --sidebar-background: #f8fafc;
+      --sidebar-nav-link-color--active: #2563eb;
+      --sidebar-nav-link-font-weight--active: 600;
+      --heading-h1-font-size: 2em;
+      --heading-h2-font-size: 1.5em;
+      --heading-h2-border-color: #e2e8f0;
+      --heading-h2-border-style: solid;
+      --heading-h2-border-width: 0 0 1px 0;
+      --heading-h2-padding: 0 0 0.5em 0;
+      --blockquote-background: #eff6ff;
+      --blockquote-border-color: #2563eb;
+      --blockquote-border-width: 0 0 0 4px;
+      --table-head-background: #f1f5f9;
+      --table-cell-border-color: #e2e8f0;
+      --code-inline-background: #f1f5f9;
+      --code-inline-color: #1e40af;
+      --code-inline-padding: 0.15em 0.4em;
+      --code-inline-border-radius: 4px;
+      --link-color: #2563eb;
+      --link-text-decoration: none;
+    }
+
+    body {
+      background: #ffffff;
+    }
+
+    .sidebar {
+      border-right: 1px solid #e2e8f0;
+    }
+
+    .sidebar .app-name {
+      font-size: 1.3em;
+      font-weight: 700;
+      color: #1e293b;
+      padding: 20px 15px 10px;
+    }
+
+    .sidebar .app-name span {
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .sidebar ul li a {
+      font-size: 0.9em;
+      color: #475569;
+      transition: color 0.2s, padding-left 0.2s;
+    }
+
+    .sidebar ul li a:hover {
+      color: #2563eb;
+      padding-left: 5px;
+    }
+
+    .markdown-section {
+      max-width: 900px;
+      padding: 30px 45px 40px;
+    }
+
+    .markdown-section h1 {
+      color: #0f172a;
+      font-weight: 800;
+      margin-top: 0;
+    }
+
+    .markdown-section h2 {
+      color: #1e293b;
+      font-weight: 700;
+      margin-top: 2.5em;
+    }
+
+    .markdown-section h3 {
+      color: #334155;
+      font-weight: 600;
+    }
+
+    .markdown-section table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1em 0;
+      font-size: 0.9em;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .markdown-section table thead tr {
+      background: #f1f5f9;
+    }
+
+    .markdown-section table th {
+      font-weight: 600;
+      color: #1e293b;
+      text-align: left;
+      padding: 10px 14px;
+    }
+
+    .markdown-section table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #475569;
+    }
+
+    .markdown-section table tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .markdown-section blockquote {
+      border-radius: 0 8px 8px 0;
+      padding: 1em 1.2em;
+      margin: 1.5em 0;
+    }
+
+    .markdown-section blockquote p {
+      margin: 0.3em 0;
+    }
+
+    .markdown-section hr {
+      border: none;
+      border-top: 2px solid #e2e8f0;
+      margin: 3em 0;
+    }
+
+    .markdown-section input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #cbd5e1;
+      border-radius: 4px;
+      vertical-align: middle;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-right: 6px;
+    }
+
+    .markdown-section input[type="checkbox"]:checked {
+      background: #2563eb;
+      border-color: #2563eb;
+    }
+
+    .markdown-section input[type="checkbox"]:checked::after {
+      content: '✓';
+      position: absolute;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .markdown-section input[type="checkbox"]:hover {
+      border-color: #2563eb;
+    }
+
+    .markdown-section ul {
+      padding-left: 1.5em;
+    }
+
+    .markdown-section li {
+      margin: 0.4em 0;
+    }
+
+    .markdown-section strong {
+      color: #0f172a;
+    }
+
+    .cover-main {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 50%, #7c3aed 100%) !important;
+    }
+
+    .cover-main h1 {
+      font-weight: 800 !important;
+    }
+
+    .search input {
+      border-radius: 8px !important;
+      border: 1px solid #e2e8f0 !important;
+      padding: 8px 12px !important;
+      font-size: 0.9em !important;
+    }
+
+    .search input:focus {
+      border-color: #2563eb !important;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+    }
+
+    @media (max-width: 768px) {
+      .markdown-section {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    window.$docsify = {
+      name: '<span>Pre-Med & CAA Roadmap</span>',
+      repo: false,
+      loadSidebar: true,
+      subMaxLevel: 3,
+      auto2top: true,
+      search: {
+        placeholder: 'Search the guide...',
+        noData: 'No results found',
+        depth: 3,
+      },
+      pagination: {
+        previousText: 'Previous',
+        nextText: 'Next',
+        crossChapter: true,
+      },
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+</body>
+</html>
