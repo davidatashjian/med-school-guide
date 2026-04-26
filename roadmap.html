@@ -247,6 +247,48 @@ body.focus-mode .data-tools:hover{opacity:1}
 .study-bar:hover::after{content:attr(data-label);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:2px 6px;border-radius:4px;font-size:.65em;white-space:nowrap}
 .study-total{font-size:.85em;color:var(--text-muted);margin-top:4px}
 
+/* === HABIT TRACKER === */
+.habit-widget{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin:16px 0}
+.habit-widget h3{font-size:1em;color:var(--text);margin:0 0 10px}
+.habit-grid{display:grid;grid-template-columns:120px repeat(7,1fr);gap:2px;font-size:.78em}
+.habit-grid .hg-header{font-weight:700;color:var(--text-muted);text-align:center;padding:4px 2px}
+.habit-grid .hg-label{font-weight:600;color:var(--text-secondary);padding:6px 4px;display:flex;align-items:center}
+.habit-grid .hg-cell{display:flex;align-items:center;justify-content:center;padding:4px}
+.habit-grid .hg-cell button{width:26px;height:26px;border-radius:6px;border:2px solid var(--border);background:var(--bg);cursor:pointer;transition:all .15s;font-size:.7em}
+.habit-grid .hg-cell button:hover{border-color:var(--accent)}
+.habit-grid .hg-cell button.checked{background:var(--accent);border-color:var(--accent);color:#fff}
+.habit-add{display:flex;gap:6px;margin-top:10px}
+.habit-add input{flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:.85em;background:var(--bg);color:var(--text)}
+.habit-add button{padding:6px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:.82em;cursor:pointer}
+
+/* === TODAY'S SCHEDULE WIDGET === */
+.today-widget{background:linear-gradient(135deg,var(--accent),#7c3aed);border-radius:14px;padding:18px 22px;margin:16px 0;color:#fff}
+.today-widget h3{font-size:1.05em;margin:0 0 10px;color:#fff;font-weight:700}
+.today-item{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.15);font-size:.88em}
+.today-item:last-child{border-bottom:none}
+.today-time{font-weight:700;min-width:90px;font-variant-numeric:tabular-nums;opacity:.9}
+.today-class{flex:1;opacity:.95}
+.today-empty{opacity:.7;font-style:italic;font-size:.9em;padding:8px 0}
+
+/* === GRADE WHAT-IF CALCULATOR === */
+.whatif-widget{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin:16px 0}
+.whatif-widget h3{font-size:1em;color:var(--text);margin:0 0 10px}
+.whatif-row{display:flex;gap:8px;align-items:center;margin:4px 0;font-size:.85em}
+.whatif-row input,.whatif-row select{padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:.85em;background:var(--bg);color:var(--text)}
+.whatif-row input{width:140px}
+.whatif-result{margin-top:12px;padding:12px;background:var(--accent-light);border-radius:10px;text-align:center;font-size:1.1em;font-weight:700;color:var(--accent)}
+.whatif-add{margin-top:8px;padding:6px 14px;background:var(--bg);border:1px dashed var(--border);border-radius:6px;font-size:.82em;cursor:pointer;color:var(--text-muted)}
+.whatif-add:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Fix floating button overlap on mobile */
+@media(max-width:768px){
+  .pomo-toggle{bottom:20px;left:16px;width:36px;height:36px;font-size:.9em}
+  .qnote-fab{bottom:20px;left:60px;width:36px;height:36px;font-size:1em}
+  .scroll-top{bottom:20px;right:16px;width:36px;height:36px;font-size:1em}
+  .pomo-widget{bottom:64px;left:16px;min-width:180px}
+  .qnote-overlay{bottom:64px;left:16px;width:280px}
+}
+
 /* === SIDEBAR COUNTDOWN === */
 .sidebar-countdown{padding:8px 20px;margin-top:auto;font-size:.75em;color:var(--text-muted);border-top:1px solid var(--border);text-align:center}
 .sidebar-countdown .cd-num{font-size:1.4em;font-weight:700;color:var(--accent);display:block}
@@ -1893,8 +1935,11 @@ render = function(p) {
   addMiniTOC();
   addCharCounters();
   addBookmarkStar();
+  addTodaySchedule();
   addDailyPlanner();
   addStudyTracker();
+  addHabitTracker();
+  addWhatIfCalc();
   // Track page visits
   const vk = 'visits_' + p;
   localStorage.setItem(vk, String((parseInt(localStorage.getItem(vk)) || 0) + 1));
@@ -2145,7 +2190,162 @@ function renderStudyChart() {
   totalEl.textContent = 'This week: ' + weekTotal.toFixed(1) + ' hours studied';
 }
 
-// === 24. WEEKLY REFLECTION ===
+// === 24. HABIT TRACKER (home page) ===
+function addHabitTracker() {
+  if (cur !== 'home') return;
+  const c = document.getElementById('c');
+  if (c.querySelector('.habit-widget')) return;
+
+  const defaults = ['Anki (15 min)','Office Hours','Exercise','Reviewed Notes','8hrs Sleep'];
+  const habits = JSON.parse(localStorage.getItem('habits') || 'null') || defaults;
+  const days = [];
+  const now = new Date();
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now); d.setDate(d.getDate() - i);
+    days.push({key: d.toISOString().slice(0,10), label: d.toLocaleDateString('en-US',{weekday:'short'})});
+  }
+
+  const widget = document.createElement('div');
+  widget.className = 'habit-widget';
+  let html = '<h3>&#9989; Daily Habits</h3><div class="habit-grid">';
+  html += '<div class="hg-header"></div>' + days.map(d => '<div class="hg-header">' + d.label + '</div>').join('');
+  habits.forEach((h, hi) => {
+    html += '<div class="hg-label">' + h + '</div>';
+    days.forEach(d => {
+      const k = 'habit_' + hi + '_' + d.key;
+      const checked = localStorage.getItem(k) === '1';
+      html += '<div class="hg-cell"><button class="' + (checked ? 'checked' : '') + '" data-hk="' + k + '" onclick="toggleHabit(this)">&#10003;</button></div>';
+    });
+  });
+  html += '</div>';
+  html += '<div class="habit-add"><input type="text" placeholder="Add a habit..." id="habit-new"><button onclick="addNewHabit()">Add</button></div>';
+  widget.innerHTML = html;
+
+  const tracker = c.querySelector('.study-tracker');
+  if (tracker) tracker.parentNode.insertBefore(widget, tracker.nextSibling);
+  else c.appendChild(widget);
+}
+function toggleHabit(btn) {
+  const k = btn.dataset.hk;
+  const on = btn.classList.toggle('checked');
+  localStorage.setItem(k, on ? '1' : '0');
+  if (on) spawnConfetti(btn.getBoundingClientRect().left + 13, btn.getBoundingClientRect().top);
+}
+function addNewHabit() {
+  const input = document.getElementById('habit-new');
+  if (!input || !input.value.trim()) return;
+  const habits = JSON.parse(localStorage.getItem('habits') || '["Anki (15 min)","Office Hours","Exercise","Reviewed Notes","8hrs Sleep"]');
+  habits.push(input.value.trim());
+  localStorage.setItem('habits', JSON.stringify(habits));
+  input.value = '';
+  const w = document.querySelector('.habit-widget');
+  if (w) w.remove();
+  addHabitTracker();
+}
+
+// === 25. TODAY'S SCHEDULE WIDGET (home page) ===
+function addTodaySchedule() {
+  if (cur !== 'home') return;
+  const c = document.getElementById('c');
+  if (c.querySelector('.today-widget')) return;
+
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const today = new Date().getDay();
+  const dayName = dayNames[today];
+
+  // Summer Block 1 schedule (May 18 - Jun 29)
+  const block1 = {
+    Mon: [{t:'9:30-10:20',c:'Bio Lab Lecture (Rozelle)'},{t:'10:30-1:20',c:'Bio I Lab (Rozelle)'},{t:'3:30-5:45',c:'Chem I Rec (K. Shih)'}],
+    Tue: [{t:'10:30-1:20',c:'Bio I Lecture (King-Trudeau)'},{t:'3:30-5:45',c:'Chem I Rec (K. Shih)'},{t:'7:00-9:50',c:'Chem I Lab (K. Shih)'}],
+    Wed: [{t:'9:30-10:20',c:'Bio Lab Lecture (Rozelle)'},{t:'10:30-1:20',c:'Bio I Lab (Rozelle)'},{t:'3:30-5:45',c:'Chem I Rec (K. Shih)'}],
+    Thu: [{t:'10:30-1:20',c:'Bio I Lecture (King-Trudeau)'},{t:'3:30-5:45',c:'Chem I Rec (K. Shih)'},{t:'7:00-9:50',c:'Chem I Lab (K. Shih)'}],
+    Fri: [], Sat: [{t:'AM',c:'Saturday Volunteering'}], Sun: []
+  };
+
+  const items = block1[dayName] || [];
+  const widget = document.createElement('div');
+  widget.className = 'today-widget';
+  let html = '<h3>&#128197; Today (' + new Date().toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'}) + ')</h3>';
+  if (items.length === 0) {
+    html += '<div class="today-empty">No classes today. Use this time for studying, shadowing, or volunteering.</div>';
+  } else {
+    items.forEach(item => {
+      html += '<div class="today-item"><span class="today-time">' + item.t + '</span><span class="today-class">' + item.c + '</span></div>';
+    });
+  }
+  widget.innerHTML = html;
+
+  // Insert at the very top of content, after h1
+  const h1 = c.querySelector('h1');
+  if (h1) h1.parentNode.insertBefore(widget, h1.nextSibling);
+}
+
+// === 26. GRADE WHAT-IF CALCULATOR (courses page) ===
+function addWhatIfCalc() {
+  if (cur !== 'courses') return;
+  const c = document.getElementById('c');
+  if (c.querySelector('.whatif-widget')) return;
+
+  const widget = document.createElement('div');
+  widget.className = 'whatif-widget';
+  widget.innerHTML = '<h3>&#129300; Grade What-If Calculator</h3>' +
+    '<p style="font-size:.82em;color:var(--text-muted);margin:0 0 10px">Enter hypothetical grades to see your projected GPA</p>' +
+    '<div id="whatif-rows"></div>' +
+    '<button class="whatif-add" onclick="addWhatIfRow()">+ Add Course</button>' +
+    '<div class="whatif-result" id="whatif-result">Enter grades above</div>';
+
+  c.appendChild(widget);
+
+  // Pre-fill with current semester courses
+  const courses = [
+    {name:'CHEM.1210 (Chem I)',cr:3},{name:'CHEM.1230L (Lab)',cr:1},
+    {name:'BIOL.1110 (Bio I)',cr:3},{name:'BIOL.1170L (Lab)',cr:1},
+    {name:'CHEM.1220 (Chem II)',cr:3},{name:'CHEM.1240L (Lab)',cr:1}
+  ];
+  courses.forEach(c => addWhatIfRow(c.name, c.cr));
+}
+
+function addWhatIfRow(name, credits) {
+  const rows = document.getElementById('whatif-rows');
+  if (!rows) return;
+  const div = document.createElement('div');
+  div.className = 'whatif-row';
+  div.innerHTML = '<input type="text" placeholder="Course name" value="' + (name||'') + '">' +
+    '<select><option value="">Grade</option><option value="4.0">A</option><option value="3.7">A-</option>' +
+    '<option value="3.3">B+</option><option value="3.0">B</option><option value="2.7">B-</option>' +
+    '<option value="2.3">C+</option><option value="2.0">C</option><option value="1.0">D</option><option value="0">F</option></select>' +
+    '<input type="number" placeholder="Credits" value="' + (credits||'') + '" style="width:60px" min="1" max="6">' +
+    '<button onclick="this.parentElement.remove();calcWhatIf()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1.1em">&#10005;</button>';
+  div.querySelector('select').addEventListener('change', calcWhatIf);
+  div.querySelectorAll('input').forEach(i => i.addEventListener('input', calcWhatIf));
+  rows.appendChild(div);
+}
+
+function calcWhatIf() {
+  const rows = document.querySelectorAll('.whatif-row');
+  let totalQP = 0, totalCr = 0;
+  rows.forEach(row => {
+    const grade = parseFloat(row.querySelector('select')?.value);
+    const credits = parseFloat(row.querySelectorAll('input')[1]?.value);
+    if (!isNaN(grade) && !isNaN(credits) && credits > 0) {
+      totalQP += grade * credits;
+      totalCr += credits;
+    }
+  });
+  const result = document.getElementById('whatif-result');
+  if (result) {
+    if (totalCr > 0) {
+      const gpa = (totalQP / totalCr).toFixed(2);
+      result.textContent = 'Projected GPA: ' + gpa + ' (' + totalCr + ' credits)';
+      result.style.color = gpa >= 3.7 ? '#16a34a' : gpa >= 3.5 ? 'var(--accent)' : gpa >= 3.0 ? '#d97706' : '#dc2626';
+    } else {
+      result.textContent = 'Enter grades above';
+      result.style.color = '';
+    }
+  }
+}
+
+// === 27. WEEKLY REFLECTION ===
 (function() {
   const lastReflect = localStorage.getItem('last_reflection_week');
   const thisWeek = Math.floor(Date.now() / (7 * 86400000));
