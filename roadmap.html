@@ -197,7 +197,7 @@ body.focus-mode .data-tools:hover{opacity:1}
 .char-count{font-size:.7em;color:var(--text-muted);text-align:right;margin-top:2px}
 
 /* === POMODORO TIMER === */
-.pomo-widget{position:fixed;bottom:80px;left:28px;background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:16px 20px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:18;min-width:220px;display:none;text-align:center;transition:all .3s}
+.pomo-widget{position:fixed;bottom:132px;right:28px;background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:16px 20px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:18;min-width:220px;display:none;text-align:center;transition:all .3s}
 .pomo-widget.show{display:block}
 .pomo-time{font-size:2.8em;font-weight:800;font-variant-numeric:tabular-nums;color:var(--accent);margin:8px 0}
 .pomo-label{font-size:.78em;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em}
@@ -208,13 +208,13 @@ body.focus-mode .data-tools:hover{opacity:1}
 .pomo-settings{display:flex;gap:8px;justify-content:center;margin-top:8px}
 .pomo-settings input{width:50px;text-align:center;border:1px solid var(--border);border-radius:6px;padding:3px;font-size:.8em;background:var(--bg);color:var(--text)}
 .pomo-settings label{font-size:.72em;color:var(--text-muted)}
-.pomo-toggle{position:fixed;bottom:28px;left:28px;width:42px;height:42px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:1.1em;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:18;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.pomo-toggle{position:fixed;bottom:80px;right:28px;width:42px;height:42px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:1.1em;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:18;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .pomo-toggle:hover{transform:scale(1.1)}
 
 /* === QUICK-NOTE FAB === */
-.qnote-fab{position:fixed;bottom:28px;left:80px;width:42px;height:42px;border-radius:50%;background:#7c3aed;color:#fff;border:none;font-size:1.3em;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:18;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.qnote-fab{position:fixed;bottom:132px;right:28px;width:42px;height:42px;border-radius:50%;background:#7c3aed;color:#fff;border:none;font-size:1.3em;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:18;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .qnote-fab:hover{transform:scale(1.1)}
-.qnote-overlay{position:fixed;bottom:80px;left:80px;width:320px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.2);z-index:19;padding:16px;display:none}
+.qnote-overlay{position:fixed;bottom:184px;right:28px;width:320px;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.2);z-index:19;padding:16px;display:none}
 .qnote-overlay.show{display:block}
 .qnote-overlay textarea{width:100%;height:120px;border:1px solid var(--border);border-radius:8px;padding:10px;font-size:.88em;font-family:inherit;resize:vertical;background:var(--bg);color:var(--text);outline:none}
 .qnote-overlay textarea:focus{border-color:var(--accent)}
@@ -282,11 +282,11 @@ body.focus-mode .data-tools:hover{opacity:1}
 
 /* Fix floating button overlap on mobile */
 @media(max-width:768px){
-  .pomo-toggle{bottom:20px;left:16px;width:36px;height:36px;font-size:.9em}
-  .qnote-fab{bottom:20px;left:60px;width:36px;height:36px;font-size:1em}
+  .pomo-toggle{bottom:68px;right:16px;width:36px;height:36px;font-size:.9em}
+  .qnote-fab{bottom:112px;right:16px;width:36px;height:36px;font-size:1em}
   .scroll-top{bottom:20px;right:16px;width:36px;height:36px;font-size:1em}
-  .pomo-widget{bottom:64px;left:16px;min-width:180px}
-  .qnote-overlay{bottom:64px;left:16px;width:280px}
+  .pomo-widget{bottom:112px;right:16px;min-width:180px}
+  .qnote-overlay{bottom:156px;right:16px;width:280px}
 }
 
 /* === SIDEBAR COUNTDOWN === */
