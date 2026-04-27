@@ -293,6 +293,33 @@ body.focus-mode .data-tools:hover{opacity:1}
 .sidebar-countdown{padding:8px 20px;margin-top:auto;font-size:.75em;color:var(--text-muted);border-top:1px solid var(--border);text-align:center}
 .sidebar-countdown .cd-num{font-size:1.4em;font-weight:700;color:var(--accent);display:block}
 
+/* === WHAT NOW WIDGET === */
+.whatnow-widget{background:linear-gradient(135deg,#059669,#10b981);border-radius:14px;padding:18px 22px;margin:16px 0;color:#fff}
+.whatnow-widget h3{font-size:1.05em;margin:0 0 8px;color:#fff;font-weight:700}
+.whatnow-widget p{color:rgba(255,255,255,.9);font-size:.9em;margin:4px 0}
+.whatnow-widget .whatnow-action{display:inline-block;margin-top:10px;padding:7px 18px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;font-size:.85em;font-weight:600;cursor:pointer;text-decoration:none;transition:background .15s}
+.whatnow-widget .whatnow-action:hover{background:rgba(255,255,255,.3);text-decoration:none}
+
+/* === MULTI-COUNTDOWN === */
+.multi-countdown{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin:16px 0}
+.cd-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.cd-card .cd-days{font-size:1.6em;font-weight:800;color:var(--accent)}
+.cd-card .cd-label{font-size:.72em;color:var(--text-muted);margin-top:2px}
+.cd-card.cd-past{opacity:.4}
+.cd-card.cd-next{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-light)}
+
+/* Version badge */
+.version-badge{font-size:.7em;color:var(--text-muted);text-align:center;padding:6px;margin-top:8px;border-top:1px solid var(--border)}
+
+/* Dark mode remaining fixes */
+body.dark .whatnow-widget{background:linear-gradient(135deg,#065f46,#059669)}
+body.dark .today-widget{background:linear-gradient(135deg,#1e40af,#4f46e5)}
+body.dark .planner-widget,body.dark .study-tracker,body.dark .habit-widget,body.dark .whatif-widget{background:var(--bg-card);border-color:var(--border)}
+body.dark .planner-item{border-bottom-color:var(--border)}
+body.dark .planner-item .del-task:hover{background:rgba(239,68,68,.15)}
+body.dark .mini-toc{background:var(--bg-card);border-color:var(--border)}
+body.dark .whatif-result{background:rgba(37,99,235,.15)}
+
 /* === BOOKMARK STAR === */
 .bookmark-star{float:right;background:none;border:none;font-size:1.2em;cursor:pointer;color:var(--border);transition:color .2s;padding:0 4px}
 .bookmark-star:hover,.bookmark-star.starred{color:#f59e0b}
@@ -1963,6 +1990,8 @@ render = function(p) {
   addCharCounters();
   addBookmarkStar();
   addTodaySchedule();
+  addWhatNow();
+  addMultiCountdown();
   addDailyPlanner();
   addStudyTracker();
   addHabitTracker();
@@ -2217,7 +2246,105 @@ function renderStudyChart() {
   totalEl.textContent = 'This week: ' + weekTotal.toFixed(1) + ' hours studied';
 }
 
-// === 24. HABIT TRACKER (home page) ===
+// === 24. WHAT SHOULD I BE DOING RIGHT NOW? ===
+function addWhatNow() {
+  if (cur !== 'home') return;
+  const c = document.getElementById('c');
+  if (c.querySelector('.whatnow-widget')) return;
+
+  const now = new Date();
+  const hour = now.getHours();
+  const day = now.getDay(); // 0=Sun
+  const dateStr = now.toISOString().slice(0,10);
+
+  let msg = '';
+  let action = '';
+  let actionPage = '';
+
+  // Time-based suggestions
+  if (hour < 8) {
+    msg = 'Early bird! Perfect time for Anki review before the day gets busy. 15 minutes of flashcards while your brain is fresh.';
+    action = 'Open Study Resources';
+    actionPage = 'resources';
+  } else if (hour < 12) {
+    if (day === 0) { msg = 'Sunday morning. Rest or do a light weekly review. Don\'t burn out.'; action = 'View Schedule'; actionPage = 'sched-summer26'; }
+    else if (day === 6) { msg = 'Saturday morning volunteering time! Then rest.'; action = 'View Volunteering'; actionPage = 'ec-volunteer'; }
+    else { msg = 'Morning study block. Focus on your hardest subject first while your energy is highest. Use the Pomodoro timer.'; action = 'Open Study Resources'; actionPage = 'resources'; }
+  } else if (hour < 17) {
+    msg = 'Afternoon — good time for practice problems, lab prep, or reaching out for shadowing/volunteering. Avoid passive reading; do active recall.';
+    action = 'View Today\'s Schedule';
+    actionPage = 'sched-summer26';
+  } else if (hour < 20) {
+    msg = 'Evening wind-down. Review today\'s lecture notes (even 10 min helps). Log any clinical hours or shadowing. Plan tomorrow.';
+    action = 'Clinical Hours Log';
+    actionPage = 'clinical';
+  } else {
+    msg = 'Late night. Stop studying — seriously. Sleep is when your brain consolidates memory. Set your alarm, do 5 min of Anki if you must, then rest.';
+    action = 'View Master Plan';
+    actionPage = 'master-plan';
+  }
+
+  const widget = document.createElement('div');
+  widget.className = 'whatnow-widget';
+  widget.innerHTML = '<h3>&#127919; What Should I Be Doing Right Now?</h3>' +
+    '<p>' + msg + '</p>' +
+    '<a class="whatnow-action" href="#" onclick="event.preventDefault();render(\'' + actionPage + '\')">' + action + '</a>';
+
+  const todayWidget = c.querySelector('.today-widget');
+  if (todayWidget) todayWidget.parentNode.insertBefore(widget, todayWidget.nextSibling);
+  else {
+    const h1 = c.querySelector('h1');
+    if (h1) h1.parentNode.insertBefore(widget, h1.nextSibling);
+  }
+}
+
+// === 24b. MULTI-COUNTDOWN (home page) ===
+function addMultiCountdown() {
+  if (cur !== 'home') return;
+  const c = document.getElementById('c');
+  if (c.querySelector('.multi-countdown')) return;
+
+  const milestones = [
+    {date:'2026-05-15', label:'Anesthesia Shadow'},
+    {date:'2026-05-18', label:'Block 1 Starts'},
+    {date:'2026-06-29', label:'Block 1 Ends'},
+    {date:'2026-07-06', label:'Block 2 Starts'},
+    {date:'2026-08-15', label:'Block 2 Ends'},
+    {date:'2026-09-02', label:'Fall 2026 Starts'},
+    {date:'2026-12-15', label:'Fall 2026 Ends'},
+    {date:'2027-01-20', label:'Spring 2027'},
+    {date:'2027-06-01', label:'MCAT Prep Begins'},
+    {date:'2027-09-13', label:'MCAT Exam'},
+    {date:'2028-03-01', label:'CASAA Opens'},
+    {date:'2028-05-01', label:'AMCAS Opens'}
+  ];
+
+  const now = new Date();
+  let foundNext = false;
+  const grid = document.createElement('div');
+  grid.className = 'multi-countdown';
+
+  milestones.forEach(m => {
+    const d = new Date(m.date);
+    const days = Math.ceil((d - now) / 86400000);
+    const card = document.createElement('div');
+    card.className = 'cd-card';
+    if (days < 0) card.classList.add('cd-past');
+    else if (!foundNext) { card.classList.add('cd-next'); foundNext = true; }
+    card.innerHTML = '<div class="cd-days">' + (days < 0 ? 'Done' : days + 'd') + '</div>' +
+      '<div class="cd-label">' + m.label + '</div>';
+    grid.appendChild(card);
+  });
+
+  // Insert before the path-at-a-glance section
+  const h2s = c.querySelectorAll('h2');
+  let target = null;
+  h2s.forEach(h => { if (h.textContent.includes('Path at a Glance') || h.textContent.includes('Quick Actions')) target = h; });
+  if (target) target.parentNode.insertBefore(grid, target);
+  else c.appendChild(grid);
+}
+
+// === 25. HABIT TRACKER (home page) ===
 function addHabitTracker() {
   if (cur !== 'home') return;
   const c = document.getElementById('c');
